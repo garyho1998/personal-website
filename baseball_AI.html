@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gary Ho</title>
+<meta name="description" content="">
+<meta name="author" content="">
+
+<!-- Favicons
+    ================================================== -->
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="72x72" href="img/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="114x114" href="img/apple-touch-icon-114x114.png">
+
+<!-- Bootstrap -->
+<link rel="stylesheet" type="text/css"  href="css/bootstrap.css">
+<link rel="stylesheet" type="text/css" href="fonts/font-awesome/css/font-awesome.css">
+
+<!-- Stylesheet
+    ================================================== -->
+<link rel="stylesheet" type="text/css"  href="css/style.css">
+<link rel="stylesheet" type="text/css"  href="css/prism_dark.css">
+<link rel="stylesheet" type="text/css"  href="css/sub-page.css">
+<link rel="stylesheet" type="text/css" href="css/nivo-lightbox/nivo-lightbox.css">
+<link rel="stylesheet" type="text/css" href="css/nivo-lightbox/default.css">
+<link href="https://fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900" rel="stylesheet">
+<style>
+
+</style>
+<!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+  <header id="header" >
+    <!-- <div class="title frp">
+      <div class="title-right">
+        <a class="btn btn-custom btn-lg page-scroll active" href="index.html">Home</a>
+        <a class="btn btn-custom btn-lg page-scroll" href="#contact">Contact</a>
+      </div>
+    </div> -->
+    <nav class="navbar navbar-default">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">ICON</a>
+        </div>
+        <ul class="nav navbar-nav">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+		<form class="navbar-form navbar-right" action="/action_page.php">
+		  <div class="input-group">
+		    <input type="text" class="form-control" placeholder="Search">
+		    <div class="input-group-btn">
+		      <button class="btn btn-default search-button" type="submit">
+		        <i class="fa fa-search my-float"></i></i>
+		      </button>
+		    </div>
+		  </div>
+		</form>
+      </div>
+    </nav>
+  </header>
+  <div id="instruction" >
+ 	<div class="row">
+	  <div class="panel panel-default main col-md-9">
+	    <div class="panel-body">
+	      <div class="section-title header">
+	        <h2>Data Analyst - TensorFlow AI to predict score</h2>
+	        <p>GaryHo   Jan 1, 2019</p>
+	      </div>
+	    <div class="content">
+	        <center>
+	          <img class="img-responsive" id="frp" src="img/baseball_wall.png">
+	        </center>
+	        <br><br><br><br><br><br>
+	        <p>&nbsp &nbsp &nbsp &nbsp This is my first AI project after i have finished the google machine learning crash course. I would like start with some 
+	        basic and I like baseball, so, here i go. 
+	        </p>
+	        <p> After this project, i noticed that the most time consuming part are data collection and organization. I choose SeanLahman.com and baseballAI.com 
+	        ( because it have 2018 mlb schedule and i want to try web scraping~ ). Here is the part of code for selenium.webdriver.
+	        <br>
+	        <br>
+	        <pre><code class="language-python">
+chrome_options = Options()
+chrome_options.add_argument("--disable-extensions")
+chrome_options.add_argument("--headless")
+try:
+	# a driver is needed because we need to wait for the web to data from database
+	driver = webdriver.Chrome(executable_path="C:/chromedriver.exe", chrome_options = chrome_options)
+except:
+	print("chrome error")
+	return 0
+driver.get(link)
+html_source = driver.page_source
+doc = html.fromstring(html_source)			
+scorebox_div = doc.xpath("//div[@class='scorebox']/div")
+			</code></pre>
+			<br>
+	        <br>
+			<p>&nbsp &nbsp &nbsp &nbsp After the data is loaded as a panada dataframe with columns of team name, players and score, I combine them with batter and pitcher data from SeanLahman. As 
+			some of the player (~0.18%) is new player and dont have any data in previous year, I filled those blank with average. </p>
+			<p>And then, I try to get the Pearson correlation coefficient of data.</p>
+			<img class="img-responsive" src="img/baseball/p_r2.png">
+			<p>It shows that pitcher and batter 3 and 4 is most important, which is make sense. However, the coefficient are very small and it may because the randomness of baseball is very large.
+			I select first 10 features and Input them to my tensorflow program with different Optimizer and Regressor Here is part of the code and RMSE result from AdagradOptimizer and DNN regressor model:</p>
+			<br>
+			<pre><code class="language-python">
+def train_model(
+    learning_rate,
+    steps,
+    batch_size,
+    hidden_units,
+    feature_columns,
+    training_examples,
+    training_targets,
+    validation_examples,
+    validation_targets):
+
+    periods = 10
+    steps_per_period = steps / periods
+    # Create a linear regressor object.
+    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+    dnn_regressor = tf.estimator.DNNRegressor(
+      feature_columns=feature_columns,
+      hidden_units=hidden_units,
+      optimizer=my_optimizer
+    )
+  
+    training_input_fn = lambda: my_input_fn(training_examples, 
+                                          training_targets["score_diff"], 
+                                          batch_size=batch_size)
+    predict_training_input_fn = lambda: my_input_fn(training_examples, 
+                                                  training_targets["score_diff"], 
+                                                  batch_size=batch_size,
+                                                  num_epochs=1, 
+                                                  shuffle=True)
+    predict_validation_input_fn = lambda: my_input_fn(validation_examples, 
+                                                    validation_targets["score_diff"], 
+                                                    batch_size=batch_size,
+                                                    num_epochs=1, 
+                                                    shuffle=True)
+
+    # Train the model, but do so inside a loop so that we can periodically assess
+    # loss metrics.
+    print("Training model...")
+    print("RMSE (on training data):")
+    training_rmse = []
+    validation_rmse = []
+    for period in range (0, periods):
+    	# Train the model, starting from the prior state.
+        dnn_regressor.train(
+            input_fn=training_input_fn,
+            steps=steps_per_period
+            )       
+    	# Take a break and compute predictions.
+        training_predictions = dnn_regressor.predict(input_fn=predict_training_input_fn)
+        training_predictions = np.array([item['predictions'][0] for item in training_predictions])
+        validation_predictions = dnn_regressor.predict(input_fn=predict_validation_input_fn)
+        validation_predictions = np.array([item['predictions'][0] for item in validation_predictions])
+    	# Compute training and validation loss.
+        training_root_mean_squared_error = math.sqrt(
+            metrics.mean_squared_error(training_predictions, training_targets))
+        validation_root_mean_squared_error = math.sqrt(
+            metrics.mean_squared_error(validation_predictions, validation_targets))
+    	# Occasionally print the current loss.
+        print("  period %02d : %0.6f" % (period, training_root_mean_squared_error))
+    	# Add the loss metrics from this period to our list.
+        training_rmse.append(training_root_mean_squared_error)
+        validation_rmse.append(validation_root_mean_squared_error)      
+    print("Model training finished.")
+			</code></pre>
+			<img class="img-responsive" src="img/baseball/ada_dnn_rmse.png">
+			<p>The rmse of standardized score difference is approching 1 which means the error of the model is one standard deviation. We can see the distrubtion from the following graph with 300 sample:</p>
+			<img class="img-responsive" src="img/baseball/adam_dnn_cat_4860.png">
+			<br><br>
+			<p>We cannot see any pattern from the above chart and the distrubtion of correct predict and false predict are quite even. 
+			And the following is the correct prediction rate from different models: </p>
+			<br>			
+			<table class="table max-table-width">
+			  <thead>
+			    <tr>
+			      <th scope="col">Optimizer\ Regressor</th>
+			      <th scope="col">Linear</th>
+			      <th scope="col">DNN</th>
+			    </tr>
+			  </thead>
+			  <tbody>
+			    <tr>
+			      <th scope="row">GD</th>
+			      <td>53.22%</td>
+			      <td>52.66%</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">FTRL</th>
+			      <td>53.22%</td>
+			      <td>52.10%</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Adam</th>
+			      <td>57.63%</td>
+			      <td class="bg-success">60.28%</td>
+			    </tr>
+			    <tr>
+			      <th scope="row">Ada</th>
+			      <td>53.17%</td>
+			      <td>52.00%</td>
+			    </tr>	
+				<tr>
+			      <th scope="row">Adag</th>
+			      <td>57.16%</td>
+			      <td>54.55%</td>
+			    </tr>					    
+			  </tbody> 
+			</table>
+			<br>
+			<p> We can see that the difference of model is very small. And i tried to increase the accuracy by adding categorical column with team
+			identity. And construct it in embedded columns </p>
+			<br>
+			<pre><code class="language-python">
+team_1 = tf.feature_column.categorical_column_with_identity(key='team', num_buckets=5, default_value=0)
+team_1_embedding_column = tf.feature_column.embedding_column(team_1, dimension=10)
+feature_columns.add(team_1_embedding_column)
+			</code></pre>
+			<br>
+			<p> However, there is no observable improvement. To conclude, Machine learning algorithm perform better than random guess but the 
+			accuracy cannot be improved easily as the correlation of data is very small. Here is <a href="https://github.com/garyho1998/baseballAI">my github</a> link for more details.</p> 
+			
+        </div>
+      </div>
+    </div>   
+    
+    <div class="secondary col-md-3">
+	    <div class="panel panel-default ">
+	    	<div class="panel-body sponsored">
+	    	Sponsored Link 1
+	    	<br><br><br><br><br>
+	    	</div>
+	</div>
+	<div class="panel panel-default">
+	    	<div class="panel-body sponsored">
+	    	Sponsored Link 2
+	    	<br><br><br><br><br>
+	    	</div>
+	  </div>
+	</div>
+  </div>
+  
+  <!-- Contact Section -->
+  <div id="contact">
+    <div class="container">
+      <center>
+        <div class="social">
+          <ul>
+            <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+            <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+            <li><a href="#"><i class="fa fa-behance"></i></a></li>
+            <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+            <li><a href="#"><i class="fa fa-pinterest"></i></a></li>
+          </ul>
+        </div>
+        <div class="section-title">
+          <p>For inquiries or collaborations please contact me by email at <strong>gary1998@connect.hku.hk</strong> or fill out the form below.</p>
+        </div>
+        <form name="sentMessage" id="contactForm" novalidate>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <input type="text" id="name" class="form-control" placeholder="Name" required="required">
+                <p class="help-block text-danger"></p>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input type="email" id="email" class="form-control" placeholder="Email" required="required">
+                <p class="help-block text-danger"></p>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <textarea name="message" id="message" class="form-control" rows="4" placeholder="Message" required></textarea>
+            <p class="help-block text-danger"></p>
+          </div>
+          <div id="success"></div>
+          <button type="submit" class="btn btn-default btn-lg">Send Message</button>
+        </form>
+      </center>
+    </div>
+  </div>
+  <div id="footer">
+    <div class="container">
+      <p>&copy; 2018 Gary Ho. All rights reserved.</p>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/jquery.1.11.1.js"></script>
+  <script type="text/javascript" src="js/bootstrap.js"></script>
+  <script type="text/javascript" src="js/nivo-lightbox.js"></script>
+  <script type="text/javascript" src="js/jquery.isotope.js"></script>
+  <script type="text/javascript" src="js/jqBootstrapValidation.js"></script>
+  <script type="text/javascript" src="js/contact_me.js"></script>
+  <script type="text/javascript" src="js/prism.js"></script>
+  
+  
+  <script>
+  var slideIndex = 1;
+  showSlides(slideIndex);
+
+  function plusSlides(n) {
+    showSlides(slideIndex += n);
+  }
+
+  function currentSlide(n) {
+    showSlides(slideIndex = n);
+  }
+
+  function showSlides(n) {
+    var i;
+    var slides = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("dot");
+    if (n > slides.length) {slideIndex = 1}
+    if (n < 1) {slideIndex = slides.length}
+    for (i = 0; i < slides.length; i++) {
+        slides[i].style.display = "none";
+    }
+    for (i = 0; i < dots.length; i++) {
+        dots[i].className = dots[i].className.replace(" active", "");
+    }
+    slides[slideIndex-1].style.display = "block";
+    dots[slideIndex-1].className += " active";
+  }
+  </script>
+  </body>
+  </html>
