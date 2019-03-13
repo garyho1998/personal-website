@@ -235,10 +235,6 @@ ol.type li a:hover {
 	overflow: hidden;
 	position: relative;
 }
-.portfolio-item img{
-	max-width: 350px;
-	min-width: 200px;
-}
 .hover-bg .hover-text {
 	position: absolute;
 	text-align: center;
@@ -359,7 +355,7 @@ color: #777;
 	color: #999;
 }
 
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 550px) {
 	#instruction .screenshot{
 		max-width: 200px;
 		max-height: 400px;
@@ -371,9 +367,18 @@ color: #777;
 	h2 {
 		font-size: 30px;
 	}
-	.portfolio-item{
-		max-width: 350px;
+	.portfolio-item img{
+		//margin: 0 auto;
+		max-width: 450px !important;
 		min-width: 200px;
+	}
+	
+	.categories{
+		display: none;
+	}
+	
+	body{
+		background-color: black !important;	
 	}
 }
 
