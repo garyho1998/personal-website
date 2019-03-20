@@ -26,7 +26,11 @@ h2 {
 	font-size: 42px;
 	color: #333;
 }
-
+h3{
+	font-size: 20px;
+	font-weight: 600;
+	color: #556f8e;
+}
 h4 {
 	font-size: 14px;
 	letter-spacing: 1px;
@@ -88,7 +92,7 @@ a:focus, .btn:focus, .btn:active:focus, .btn.active:focus, .btn.focus, .btn:acti
 	text-transform: uppercase;
 	color: #444;
 	background-color: transparent;
-	border: 2px solid #444;
+	border: 2px solid #556f8e;
 	padding: 14px 20px;
 	margin: 0;
 	font-size: 14px;
@@ -99,7 +103,7 @@ a:focus, .btn:focus, .btn:active:focus, .btn.active:focus, .btn.focus, .btn:acti
 }
 .btn-custom:hover, .btn-custom:focus, .btn-custom.focus, .btn-custom:active, .btn-custom.active {
 	color: #eee;
-	background-color: #444;
+	background-color: #556f8e;
 }
 /* Section */
 .title {
@@ -179,16 +183,16 @@ ol.type li a {
 	color: #444;
 	font-size: 14px;
 	padding: 10px 20px;
-	border: 2px solid #444;
+	border: 2px solid #556f8e;
 	border-radius: 0;
 	text-transform: uppercase;
 }
 ol.type li a.active {
-	background: #444;
+	background: #556f8e;
 	color: #eee;
 }
 ol.type li a:hover {
-	background: #444;
+	background: #556f8e;
 	color: #eee;
 }
 .isotope-item {
@@ -355,7 +359,7 @@ color: #777;
 	color: #999;
 }
 
-@media screen and (max-width: 550px) {
+@media screen and (max-width: 600px) {
 	#instruction .screenshot{
 		max-width: 200px;
 		max-height: 400px;
@@ -375,10 +379,6 @@ color: #777;
 	
 	.categories{
 		display: none;
-	}
-	
-	body{
-		background-color: black !important;	
 	}
 }
 

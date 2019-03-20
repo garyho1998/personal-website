@@ -59,14 +59,14 @@ img {vertical-align: middle;}
 	max-width: 400px;
 }
 p a:link {
-  color: blue; 
-  //background-color: transparent; 
+  color: blue;
+  //background-color: transparent;
   text-decoration: underline;
 }
 
 p a:visited {
   color: blue;
-  
+
   text-decoration: underline;
 }
 
@@ -90,7 +90,7 @@ p a:active {
 video{
 	max-width: 300px;
 	max-height: 500px;
-	margin-bottom: 20px; 	
+	margin-bottom: 20px;
 }
 .content > .row{
 	margin-left: 0px;
