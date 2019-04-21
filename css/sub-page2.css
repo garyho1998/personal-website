@@ -3,13 +3,13 @@ body {
   background-color: #454E59;
   min-width:500px;
 }
-.container{
-	width: 80%;
-}
-@media screen and (max-width: 768px) {
-	.container{
-		width: 100%;
-	}
+/* .container{
+  width: 85%;
+} */
+@media only screen and (max-width: 767.5px) {
+  /* .container{
+    width: 100%;
+  } */
 	.left-bottom{
 		visibility: hidden;
 		display: none;
